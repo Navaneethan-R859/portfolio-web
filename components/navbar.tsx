@@ -1,79 +1,112 @@
-'use client'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+"use client";
+
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    if (storedTheme) {
-      setTheme(storedTheme)
-      document.documentElement.classList.toggle('dark', storedTheme === 'dark')
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      setTheme(prefersDark ? 'dark' : 'light')
-      document.documentElement.classList.toggle('dark', prefersDark)
-    }
-  }, [])
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    document.documentElement.classList.toggle('dark', newTheme === 'dark')
-    localStorage.setItem('theme', newTheme)
-  }
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md">
+      <div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold">
-          Navaneethan <span className="text-red-500">.</span> R
+        <Link
+          href="/"
+          className="text-lg font-bold text-gray-900 dark:text-white"
+          aria-label="Go to homepage"
+        >
+          Navaneethan R
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-8">
-          <Link href="/">Home</Link>
-          <Link href="/about">About me</Link>
-          <Link href="/services">Services</Link>
-          <Link href="/work">My Work</Link>
-          <Link href="/contact">Contact me</Link>
-        </div>
-
-        {/* Right Section */}
-        <div className="flex items-center gap-4">
+        <nav className="hidden md:flex gap-6 items-center">
+          <Link href="/" className="hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Home
+          </Link>
+          <Link href="/about" className="hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            About
+          </Link>
+          <Link href="/work" className="hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Projects
+          </Link>
+          <Link href="/contact" className="hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Contact
+          </Link>
           <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            className="px-3 py-2 rounded bg-gray-200 dark:bg-gray-800 text-sm transition-colors"
+            aria-label="Toggle dark/light mode"
           >
-            {theme === 'light' ? '🌙' : '☀️'}
+            {theme === "light" ? "🌙 Dark" : "☀️ Light"}
           </button>
+        </nav>
 
-          {/* Hamburger Menu for Mobile */}
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded bg-gray-200 dark:bg-gray-700"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+            aria-label="Toggle menu"
+            aria-expanded={isMenuOpen}
           >
-            ☰
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col p-4 space-y-3">
-            <Link href="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
-            <Link href="/about" onClick={() => setIsMenuOpen(false)}>About me</Link>
-            <Link href="/services" onClick={() => setIsMenuOpen(false)}>Services</Link>
-            <Link href="/work" onClick={() => setIsMenuOpen(false)}>My Work</Link>
-            <Link href="/contact" onClick={() => setIsMenuOpen(false)}>Contact me</Link>
-          </div>
-        </div>
-      )}
-    </nav>
-  )
+      {/* Mobile Dropdown */}
+      <div
+        className={`md:hidden bg-white dark:bg-gray-900 shadow-inner overflow-hidden transition-all duration-300 ${
+          isMenuOpen ? "max-h-96" : "max-h-0"
+        }`}
+      >
+        <nav className="flex flex-col p-4 gap-2">
+          <Link
+            href="/"
+            onClick={() => setIsMenuOpen(false)}
+            className="block px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded"
+          >
+            Home
+          </Link>
+          <Link
+            href="/about"
+            onClick={() => setIsMenuOpen(false)}
+            className="block px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded"
+          >
+            About
+          </Link>
+          <Link
+            href="/work"
+            onClick={() => setIsMenuOpen(false)}
+            className="block px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded"
+          >
+            Projects
+          </Link>
+          <Link
+            href="/contact"
+            onClick={() => setIsMenuOpen(false)}
+            className="block px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded"
+          >
+            Contact
+          </Link>
+          <button
+            onClick={() => {
+              setTheme(theme === "light" ? "dark" : "light");
+              setIsMenuOpen(false);
+            }}
+            className="block w-full text-left px-2 py-1 rounded bg-gray-200 dark:bg-gray-800 text-sm transition-colors"
+          >
+            {theme === "light" ? "🌙 Dark" : "☀️ Light"}
+          </button>
+        </nav>
+      </div>
+    </header>
+  );
 }
